@@ -23,11 +23,13 @@
 /// @brief Defines a number of SMPP specific types and auxiliary functions.
 
 #include <cstdio>
+#include <cstring>
+#include <iostream>
+#include <iomanip>
 #include <string>
 #include <algorithm>
 #include <vector>
 #include <list>
-#include <iomanip>
 #include "error.hpp"
 
 namespace Smpp {
