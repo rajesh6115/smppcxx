@@ -1,0 +1,19 @@
+CC = cl
+CFLAGS = /nologo /EHsc /wd4996 /c
+
+SOURCE = alert_notification.cpp aux_types.cpp bind_receiver.cpp bind_receiver_resp.cpp bind_transceiver.cpp bind_transceiver_resp.cpp bind_transmitter.cpp bind_transmitter_resp.cpp broadcast_sm.cpp broadcast_sm_resp.cpp buffer.cpp cancel_broadcast_sm.cpp cancel_broadcast_sm_resp.cpp cancel_sm.cpp cancel_sm_resp.cpp data_sm.cpp data_sm_resp.cpp deliver_sm.cpp deliver_sm_resp.cpp enquire_link.cpp enquire_link_resp.cpp error.cpp generic_nack.cpp header.cpp outbind.cpp query_broadcast_sm.cpp query_broadcast_sm_resp.cpp query_sm.cpp query_sm_resp.cpp replace_sm.cpp replace_sm_resp.cpp submit_multi.cpp submit_multi_resp.cpp submit_sm.cpp submit_sm_resp.cpp unbind.cpp unbind_resp.cpp 
+
+HEADERS = alert_notification.hpp aux_types.hpp bind_receiver.hpp bind_receiver_resp.hpp bind_transceiver.hpp bind_transceiver_resp.hpp bind_transmitter.hpp bind_transmitter_resp.hpp broadcast_sm.hpp broadcast_sm_resp.hpp buffer.hpp cancel_broadcast_sm.hpp cancel_broadcast_sm_resp.hpp cancel_sm.hpp cancel_sm_resp.hpp command_id.hpp command_length.hpp command_status.hpp data_sm.hpp data_sm_resp.hpp deliver_sm.hpp deliver_sm_resp.hpp enquire_link.hpp enquire_link_resp.hpp error.hpp generic_nack.hpp header.hpp outbind.hpp query_broadcast_sm.hpp query_broadcast_sm_resp.hpp query_sm.hpp query_sm_resp.hpp replace_sm.hpp replace_sm_resp.hpp sequence_number.hpp smpp.hpp submit_multi.hpp submit_multi_resp.hpp submit_sm.hpp submit_sm_resp.hpp tlv.hpp types.hpp unbind.hpp unbind_resp.hpp
+
+OBJECTS = alert_notification.obj aux_types.obj bind_receiver.obj bind_receiver_resp.obj bind_transceiver.obj bind_transceiver_resp.obj bind_transmitter.obj bind_transmitter_resp.obj broadcast_sm.obj broadcast_sm_resp.obj buffer.obj cancel_broadcast_sm.obj cancel_broadcast_sm_resp.obj cancel_sm.obj cancel_sm_resp.obj data_sm.obj data_sm_resp.obj deliver_sm.obj deliver_sm_resp.obj enquire_link.obj enquire_link_resp.obj error.obj generic_nack.obj header.obj outbind.obj query_broadcast_sm.obj query_broadcast_sm_resp.obj query_sm.obj query_sm_resp.obj replace_sm.obj replace_sm_resp.obj submit_multi.obj submit_multi_resp.obj submit_sm.obj submit_sm_resp.obj unbind.obj unbind_resp.obj 
+
+.cpp.obj:
+	$(CPP) $(CFLAGS) $<
+
+smpp: $(OBJECTS)
+	$(CPP) /LD /Fe$@ $(OBJECTS)
+	lib /OUT:$@.lib $(OBJECTS)
+
+clean:
+	del *.obj *.dll *.lib *~
+

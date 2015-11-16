@@ -1,0 +1,169 @@
+<html>
+<body>
+<h2>Installation</h2>
+Unpacking the archive will create a directory smppcxx/src that contains all
+source files.
+
+<h2>Building</h2>
+All code is standard C++, therefore it should build using any modern C++
+compiler.
+To start you off there are two make files included
+<br>
+(i) Makefile.nmake that should be called by the nmake make for building on 
+windows.<br>
+(ii) Makefile.gmake that should be called by gmake make for compiling on unix
+type systems.<br>
+
+<h2>Usage</h2>
+There is a sample program in the directory smppcxx/sample_app that shows usage
+of the most commonly used PDUs, it is a good idea to look at that code.
+It is also useful to look at the library header files for the respective PDUs,
+e.g. bind_transceiver.hpp, etc.<br>
+<h3>Basic types</h3>
+The following basic types are used through out the library.
+(Currently they are basic typedefs)<br>
+<code>
+Smpp::Char; // 8 bit signed (typedef char - used in a C-Octet string)<br>
+Smpp::String; // C-Octet string (typedef std::basic_string<Char>)<br>
+Smpp::Uint8; // Octet (unsigned) (typedef unsigned char)<br>
+Smpp::Uint16; // 16 bit unsigned integer (typedef unsigned short)<br>
+Smpp::Uint32; // 32 bit unsigned integer(typedef unsigned int)<br>
+</code>
+<p>
+<h3>Protocol Data Units (PDUs) representation</h3>
+Each SMPP PDU is represented as a C++ class, e.g. BindTransceiver, SubmitSm,
+EnquireLink, etc. All classes are defined inside the Smpp namespace.<br>
+Therefore to construct a PDU just declare an instance of the specific PDU
+class, e.g.<br>
+
+<code>Smpp::SubmitSm pdu;</code><br>
+
+All PDUs have the same set of constructors<br>
+(i) Default constructor, in the above example a basic submit_sm PDU is
+created; the command_id is set to 0x00000004, the sequence_number set to
+0x00000001 and the command_length set to the minimum length of a submit_sm (33
+octets).<br>
+(ii) Constructor that takes the sequence_number followed by all the mandatory
+parameters in the order listed in the spec (in the case of response PDUs the
+command_status is also required before the sequence_number.<br>
+(iii) Contructor that takes an octet stream as an argument. The length of the
+octet stream is determined internally by looking at the first 4 bytes (the
+command_length parameter).<br>
+
+<h3>Mandatory parameters</h3>
+All mandatory parameters have a specific class, in most cases these
+are just wrappers that are used to performed basic verification of the data,
+e.g. string length.
+<p>
+The parameters (with the exceptions of address and short message) can be
+assigned to and from their underlining basic type e.g.<br>
+<code>
+std::string s = "xyz";<br>
+Smpp::ServiceType servtype(s);<br>
+Smpp::String s1 = servtype;<br>
+<br>
+Smpp::DataCoding datacoding;<br>
+datacoding = 2;<br>
+int i = datacoding;<br>
+</code>
+
+<p>
+The mandatory parameters can be set using operations with a similar name to the 
+parameter descriptions in the SMPP specification, e.g.<br>
+
+<code>pdu.service_type("ABCDE");</code><br>
+
+Similarly the parameter value can be accessed by<br>
+
+<code>const Smpp::ServiceType&amp; s = pdu.service_type();</code><br>
+
+<h4>Address parameter</h4>
+The address parameters (source_addr, destination_addr, etc) are of type
+<code>Smpp::SmeAddress</code>. It is composed of a TON, NPI and address 
+(<code>Smpp::Ton</code>, <code>Smpp::Npi</code> and <code>Smpp::Address</code>
+respectively). The address len defaults to 21 characters but can be changed by
+setting the len argument. The constructors are<br>
+<code>
+Smpp::SmeAddress();<br>
+Smpp::SmeAddress(const Smpp::Ton&amp; ton, const Smpp::Npi&amp; npi, const Smpp::Address&amp; addr, size_t len);<br>
+Smpp::SmeAddress(const Smpp::Address&amp; addr, size_t len);<br>
+</code><br>
+The individual parameters can be accessed using the member functions<br>
+<code>
+const Smpp::Ton&amp; ton() const;<br>
+const Smpp::Npi&amp; npi() const;<br>
+const Smpp::Address&amp; address() const;<br>
+size_t length() const;<br>
+</code>
+
+<h4>Short message parameter</h4>
+The sm_length and short_message parameters are encapsulated in an 
+<code>Smpp::ShortMessage</code> which can be constructed using<br>
+<code>
+/* Octet array and length */<br>
+Smpp::ShortMessage(Smpp::Uint8* data, Smpp::Uint8 length);<br>
+/* C++ String (std::string) */<br>
+Smpp::ShortMessage(Smpp::String&amp; data);<br>
+/* NULL terminated C string */<br>
+Smpp::ShortMessage(Smpp::Char* data);<br>
+</code>
+<p>
+Internally the data is stored as a std::vector&lt;Smpp::Uint8&gt; and can be
+accessed as follows<br>
+<code>
+// a constance reference<br>
+const std::vector&lt;Smpp::Uint8&gt;&amp; sm = pdu.short_message();<br>
+<br>
+// therefore you can do the following<br>
+pdu.short_message().size();<br>
+pdu.short_message().begin();<br>
+pdu.short_message().end();<br>
+</code>
+<h3>Tag, Length, Value (TLV) parameters</h3>
+TLVs (or optional parameters) are added to a PDU using an insert member
+function. An Smpp::Tlv can be created stand alone and then inserted
+using the <code>insert_tlv(const Smpp::Tlv&amp;)</code> member function.<br>
+A stand alone SMPP TLV can be created using a tag, length and value.<br>
+
+<code>
+Smpp::Tlv(Smpp::Uint16&amp; tag, Smpp::Uint16&amp; length, Smpp::Uint8* value);
+</code><br>
+
+This can then be inserted into a PDU using the member function<br>
+
+<code>void insert_tlv( const Smpp::Tlv&amp; tlv );</code><br>
+e.g.<br>
+<code>
+Smpp::SubmitSm pdu;<br>
+Smpp::Tlv tlv(Smpp::Tlv::message_payload, 5, "Hello");<br>
+pdu.insert_tlv(tlv);<br>
+</code>
+<p>
+There are also special TLV member functions for the different value types<br>
+<code>
+void insert_8bit_tlv(Smpp::Uint16 tag, const Smpp::Uint8 value);<br>
+void insert_16bit_tlv(Smpp::Uint16 tag, const Smpp::Uint16 value);<br>
+void insert_32bit_tlv(Smpp::Uint16 tag, const Smpp::Uint32 value);<br>
+void insert_string_tlv(Smpp::Uint16 tag, const Smpp::String&amp; value);<br>
+void insert_array_tlv(Smpp::Uint16 tag, Smpp::Uint16 length, const Smpp::Uint8* value);<br>
+</code>
+<p>
+There are three ways of accessing TLVs. A user should not modify the TLVs
+returned as it may corrupt the entire PDU.<br>
+(i) By accessing the entire list (internally the TLVs are stored in a 
+std::list&lt;const Tlv*&gt; list which is typedef'd to TlvList.<br>
+<code>const TlvList&amp; tlv_list() const;</code><br>
+(ii) If it is possible to have more than one occurance of a TLV use the member
+function<br>
+<code>const TlvList find_tlv_list(Uint16 tag) const;</code><br>
+(iii) By accessing an individual element<br>
+<code>const Tlv* find_tlv(Uint16 tag) const;</code>
+<p>
+If in the first two cases there are no TLVs then the list will have zero
+elements, in the third case a 0 is returned.
+<p>
+A TLV can also be removed by<br>
+<code>void remove_tlv(Uint16 tag);</code>
+
+</body>
+</html>
