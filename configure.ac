@@ -28,6 +28,7 @@ AC_ENABLE_SHARED
 AC_CONFIG_FILES([
                 Makefile
                 src/Makefile
+		libsmppcxx.pc
 ])
 AC_OUTPUT
 

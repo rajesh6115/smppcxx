@@ -13,3 +13,11 @@ libtool
 m4/
 src/.deps/
 stamp-h1
+*.pc
+*.o
+*.lo
+*.so
+*.so.*
+*.a
+*.la
+.libs/
