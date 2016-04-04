@@ -317,7 +317,11 @@ namespace Smpp {
         const Npi& npi() const { return npi_; }
         const Address& address() const { return addr_; }
         size_t length() const { return 2 + addr_.length() + 1; }
-
+	
+	///
+	void set_address(const Address& addr){
+		addr_ = addr;
+	}
         /// @brief Decode an SME address.
         /// @param buff SMPP PDU buffer offsetted to the SME address.
         /// @param len Number of octets left in the PDU buffer.
